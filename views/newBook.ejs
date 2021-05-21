@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <title>e-library</title>
+</head>
+<body>
+    <div class="container">
+        <hr>
+        <h1>Create New Book</h1>
+        <hr>
+    
+        <form action="http://localhost:8000/books" method="POST">
+            <div class="form-group">
+                <label for="ISBN">ISBN</label><br>
+                <input class="form-control" name="isbn">
+            </div>
+    
+            <div class="form-group">
+                <label for="Title">Title</label><br>
+                <input class="form-control" name="title">
+            </div>
+
+            <div class="form-group">
+                <label for="Author">Author</label><br>
+                <input class="form-control" name="author">
+            </div>
+    
+            <div class="form-group">
+                <label for="Pdate">Published Date:</label><br>
+                <input class="form-control" name="Pdate">
+            </div>
+            
+            <div class="form-group">
+                <label for="Publisher">Publisher</label><br>
+                <input class="form-control" name="publisher">
+            </div>
+
+            <div class="form-group">
+                <label for="pages">No. of Pages</label><br>
+                <input class="form-control" name="pages">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
