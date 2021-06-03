@@ -15,12 +15,18 @@ module.exports = class UserServices{
         return newUser.save()
     }
 
-    static async retrieveUserByDisplayName(displayName) {
-        return Users.findOne({where: { displayName: displayName }})
+    static async retrieveUserByDisplayName(paramsId) {
+        try {
+            console.log('i got here')
+            return Users.findById(paramsId)
+        }
+        catch (error) {
+            console.log(error)
+        }
     }
 
     static async editUserProfile(displayName, email, password, country, tel, paramsId) {
-        return Users.update({
+        return Users.updateOne({
             'displayName': displayName,
             'email': email,
             'password': password,

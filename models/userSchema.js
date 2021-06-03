@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
         require: true,
         unique: true
     },
-    password: {
+    hashPassword: {
         type: String
     },
     country: {
@@ -40,4 +40,4 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Users', UserSchema);
+module.exports = mongoose.model('users', UserSchema);

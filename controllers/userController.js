@@ -23,13 +23,15 @@ module.exports = class UserController{
     static async getUserByDisplayName(req, res) {
 
         try {
-            let user = await UserServices.retrieveUserByDisplayName(req.params.displayName)
+            console.log('i got here 22')
+            let user = await UserServices.retrieveUserByDisplayName(req.params.id)
             return res.status(200).json({
                 status: 'success',
                 profile: user
             })
         } 
         catch (error) {
+            console.log(error)
             return res.status(500).json({
                 status: 'failed',
                 error

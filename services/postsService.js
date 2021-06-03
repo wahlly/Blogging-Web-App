@@ -10,13 +10,18 @@ module.exports = class PostServices{
                 type: Schema.types.ObjectId,
                 ref: 'Users'
             },
-            'content': content 
+            content: content 
          })
 
     }
-
-    static async retrieveAllPosts(displayName) {
-        return Users.findOne({ 'displayName': displayName }).populate('Posts')
+    /**
+     * 
+     * @desc get every posts ever created by a user
+     */
+    static async retrieveAllPosts(userId) {
+        return Users.findOne(userId)
+            .populate('Posts')
+            .lean()
     }
 
     static async editPost(paramsId, content) {
