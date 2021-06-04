@@ -27,28 +27,41 @@ module.exports = class UserServices{
         }
     }
 
-    static async retrieveUserByDisplayName(paramsId) {
+    /**
+     * @desc get a user's info or profile using its displayName
+     * @param {user's displayName} displayName 
+     * @returns either the user's profile if found or null if otherwise
+     */
+    static async retrieveUserByDisplayName(displayName) {
         try {
-            return Users.findById(paramsId)
+        return await Users.findOne({displayName: displayName},
+            {
+                tel: true,
+                displayName: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                createdAt: true
+            })
         }
         catch (error) {
             console.log(error)
         }
     }
 
-    static async editUserProfile(displayName, email, password, country, tel, paramsId) {
-        return Users.updateOne({
+    static async editUserProfile(displayName, email, country, tel, paramsId) {
+        return Users.findOneAndUpdate({_id: paramsId},
+            {
             'displayName': displayName,
             'email': email,
-            'password': password,
             'country': country,
             'tel': tel
         },
         {
-            where: {
-                _id: paramsId
-            }
-        })
+            new: true,
+            runValidators: true
+        }
+        )
     }
 
     

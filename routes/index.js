@@ -5,5 +5,7 @@ const authRoute = require('./authRoutes')
 module.exports = (app) => {
     app.use('/auth', authRoute)
 
+    app.use('/api/user', usersRoutes)
+
     app.use('/api/posts', postRoutes)
 }

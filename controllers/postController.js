@@ -101,7 +101,7 @@ module.exports = class PostController{
     }
 
     /**
-     * @route PUT 
+     * @route PUT /api/posts/edit/:postId
      * @param {post id} req
      * @param {post content} req.body 
      * @returns updated post
@@ -109,7 +109,7 @@ module.exports = class PostController{
     static async updatePost(req, res) {
 
         try {
-            let post = await PostServices.editPost(req.params._id, req.body.content)
+            let post = await PostServices.editPost(req.params.id, req.body.content)
 
             if(!post) {
                 return res.status(404).json({
@@ -139,7 +139,7 @@ module.exports = class PostController{
     static async deletePost(req, res) {
 
         try {
-            let post = await PostServices.removePost(req.params._id)
+            let post = await PostServices.removePost(req.params.id)
 
             if(!post) {
                 return res.status(400).json({ msg: 'Bad request' })

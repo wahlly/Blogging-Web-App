@@ -73,11 +73,22 @@ module.exports = class UserController{
         }
     }
 
+    /**
+     *@route GET /api/user/:displayName
+     * @param {user's displayName} req
+     * @returns the user's profile if found
+     */
     static async getUserByDisplayName(req, res) {
 
         try {
-            console.log('i got here 22')
-            let user = await UserServices.retrieveUserByDisplayName(req.params.id)
+            let user = await UserServices.retrieveUserByDisplayName(req.params.displayName)
+
+            if(!user) {
+                return res.status(404).json({
+                    status: 'failed',
+                    msg: 'User not found'
+                })
+            }
             return res.status(200).json({
                 status: 'success',
                 profile: user
@@ -94,9 +105,17 @@ module.exports = class UserController{
     }
 
     static async updateUserProfile(req, res) {
-
+        
         try {
-            let user = await UserServices.editUserProfile(req.body.displayName, req.body.email, req.body.password, req.body.country, req.body.tel, req.params._Id)
+            let user = await UserServices.editUserProfile(req.body.displayName, req.body.email, req.body.country, req.body.tel, req.params.Id)
+
+            if(!user) {
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'cannot be updated!'
+                })
+            }
+            user.hashPassword = undefined
             return res.status(200).json({
                 status: 'success',
                 profile: user

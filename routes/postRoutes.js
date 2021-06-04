@@ -11,10 +11,10 @@ router.get('/:id', (req, res) => getPost(req, res))
 router.get('/user/:author', (req, res) => getAllPosts(req, res))
 
 /**@route PUT to edit a post made by a user */
-router.post('/:_id', (req, res) => updatePost(req, res))
+router.put('/edit/:id', (req, res) => updatePost(req, res))
 
 /**@route DELETE to delete a post created by a user */
-router.delete('/:_id', (req, res) => deletePost(req, res))
+router.delete('/:id', (req, res) => deletePost(req, res))
 
 
 module.exports = router

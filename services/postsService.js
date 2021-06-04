@@ -55,7 +55,7 @@ module.exports = class PostServices{
      * 
      * @param {post id} paramsId 
      * @param {blog post} content 
-     * @desc edits a blog post
+     * @desc edits a blog post using the post's id
      */
     static async editPost(paramsId, content) {
         try{
