@@ -1,9 +1,12 @@
 const router = require('express').Router()
-const { postNewUser, getUserByDisplayName, updateUserProfile } = require('../controllers/userController')
+const { getUserByDisplayName, updateUserProfile, createNewUser, checkUsersLogin } = require('../controllers/userController')
 
 
 /** @route POST to create a new user*/
-router.post('/', (req, res) => postNewUser(req, res))
+router.post('/register', (req, res) => createNewUser(req, res))
+
+/**@route PoST to authenticate a user's login */
+router.post('/login', (req, res) => checkUsersLogin(req, res))
 
 /**@route GET to find a user by its displayName*/
 router.get('/:_id', (req, res) => getUserByDisplayName(req, res))

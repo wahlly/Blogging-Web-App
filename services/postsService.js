@@ -1,42 +1,83 @@
 const Posts = require('../models/postsSchema');
-const Users = require('../models/userSchema');
+const mongoose = require('mongoose')
+const { UserSchema } = require('../models/userSchema');
+const Users = mongoose.model('users', UserSchema)
 
 module.exports = class PostServices{
 
-    static async createPost(content) {
-
-        return Posts.create({
-            author: {
-                type: Schema.types.ObjectId,
-                ref: 'Users'
-            },
-            content: content 
-         })
-
-    }
     /**
      * 
+     * @desc create a new blog post
+     * @param {post} content
+     */
+    static async createPost(paramsId, content) {
+        try{
+            let user = await Users.findById(paramsId)
+            let newPost = await new Posts({content})
+
+            newPost.author = user
+            return await newPost.save()
+        }
+        catch(err) {
+            console.error(err)
+        }
+
+    }
+
+    /**
+     * 
+     * @param {post id} paramsId 
+     * @desc gets a single post by its id
+     */
+    static async retrievePost(paramsId) {
+        try{
+            return await Posts.findById(paramsId).lean()
+        }
+        catch(err) {
+            console.error(err)
+        }
+    }
+
+    /**
+     * @param {id of user } userId
      * @desc get every posts ever created by a user
      */
     static async retrieveAllPosts(userId) {
-        return Users.findOne(userId)
-            .populate('Posts')
-            .lean()
+        try{
+            return await Posts.find({author: userId}).lean()
+        }
+        catch(err) {
+            console.error(err)
+        }
     }
 
+    /**
+     * 
+     * @param {post id} paramsId 
+     * @param {blog post} content 
+     * @desc edits a blog post
+     */
     static async editPost(paramsId, content) {
-
-        return Posts.updateOne({
-            'content': content
-        },
-        {
-            where: { '_id': paramsId }
-        })
+        try{
+            return await Posts.findOneAndUpdate({_id: paramsId}, {content: content}, {new: true, runValidators: true})
+        }
+        catch(err) {
+            console.error(err)
+        }
 
     }
 
+    /**
+     * 
+     * @param {post id} paramsId 
+     * @desc deletes a post
+     */
     static async removePost(paramsId) {
-
-        return Posts.deleteOne(paramsId)
+        try{
+            return await Posts.findByIdAndDelete(paramsId)
+        }
+        catch(err) {
+            console.error(err)
+        }
     }
 }

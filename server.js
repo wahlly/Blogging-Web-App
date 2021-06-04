@@ -7,10 +7,10 @@ const bodyParser = require('./middlewares/middleware')
 const connectDB = require('./models/dbconfig')
 const route = require('./routes/index')
 
+connectDB()
+
 app.use(cors())
 bodyParser(app)
-
-connectDB()
 route(app)
 
 
