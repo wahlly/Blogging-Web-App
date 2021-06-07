@@ -13,24 +13,24 @@ exports.UserSchema = new mongoose.Schema({
     displayName: {
         type: String,
         require: true,
-        unique: true
+        unique: [true, 'displayName already taken, try something else']
     },
     email: {
         type: String,
         require: true,
-        unique: true
+        unique: [true, 'email has been used by another user']
     },
     hashPassword: {
         type: String
     },
     country: {
         type: String,
-        require: true
+        required: [true, 'please, fill in your country!']
     },
     tel: {
         type: Number,
-        unique: true,
-        require: true
+        unique: [true, 'number has already been used!'],
+        required: [true, 'phone number is required!']
     }
 },
 {

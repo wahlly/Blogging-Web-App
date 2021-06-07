@@ -10,6 +10,7 @@ module.exports = class UserController{
     static async createNewUser(req, res) {
 
         try {
+    
             let newUser = await UserServices.userRegistration(req.body)
             newUser.hashPassword = undefined
 
@@ -22,7 +23,7 @@ module.exports = class UserController{
             console.error(err)
             return res.status(500).json({
                 status: 'failed',
-                msg: 'server error'
+                msg: err
             })
         }
 
@@ -104,10 +105,16 @@ module.exports = class UserController{
 
     }
 
+    /**
+     * 
+     * @route PUT /api/user/:userId
+     * @param {user's id & profile to be updated} req 
+     * @returns updated user's profile if successful
+     */
     static async updateUserProfile(req, res) {
         
         try {
-            let user = await UserServices.editUserProfile(req.body.displayName, req.body.email, req.body.country, req.body.tel, req.params.Id)
+            let user = await UserServices.editUserProfile(req.params.id, req.body.displayName, req.body.email, req.body.country, req.body.tel)
 
             if(!user) {
                 return res.status(400).json({
@@ -128,6 +135,29 @@ module.exports = class UserController{
             })
         }
 
+    }
+
+    static async deleteUser(req, res) {
+        try {
+            let user = await UserServices.removeUser(req.params.id)
+
+            if(!user) {
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'Unable to complete your request'
+                })
+            }
+            return res.status(200).json({
+                status: 'success',
+                msg: "user's data has been erased successfully"
+            })
+        } 
+        catch(err) {
+            res.status(500).json({
+                status: 'failed',
+                msg: 'server error, please try again'
+            })
+        }
     }
 
 

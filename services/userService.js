@@ -1,16 +1,28 @@
 const mongoose = require('mongoose')
 const { UserSchema } = require('../models/userSchema')
 const Users = mongoose.model('users', UserSchema)
+const Validations = require('../validators/validator');
 const bcrypt = require('bcrypt')
 const saltRound = 10
 
 module.exports = class UserServices{
-    static async userRegistration(userProfile) {
-        const newUser = new Users(userProfile)
-        const salt = bcrypt.genSaltSync(saltRound)
-        newUser.hashPassword = bcrypt.hashSync(userProfile.password, salt)
 
-        return newUser.save()
+    static async userRegistration(userProfile) {
+        try{
+            let { error, isValid } = await Validations.newUser(userProfile)
+            if(!isValid) {
+                return error
+            }
+
+            const newUser = new Users(userProfile)
+            const salt = bcrypt.genSaltSync(saltRound)
+            newUser.hashPassword = bcrypt.hashSync(userProfile.password, salt)
+
+            return newUser.save()
+        }
+        catch(err) {
+            console.error(err)
+        }
     }
 
     /**
@@ -20,6 +32,7 @@ module.exports = class UserServices{
      */
     static async credentialsValidation(usersMail) {
         try {
+
             return await Users.findOne({email: usersMail})
         }
         catch(err) {
@@ -37,6 +50,7 @@ module.exports = class UserServices{
         return await Users.findOne({displayName: displayName},
             {
                 tel: true,
+                country: true,
                 displayName: true,
                 email: true,
                 firstName: true,
@@ -49,19 +63,39 @@ module.exports = class UserServices{
         }
     }
 
-    static async editUserProfile(displayName, email, country, tel, paramsId) {
-        return Users.findOneAndUpdate({_id: paramsId},
+    /**
+     * @desc finds a user with the given id and update whats given into his profile.
+     * @param {user's id} paramsId
+     * @param {editable profile} req.body 
+     * @returns the updated user's profile if found
+     */
+    static async editUserProfile(paramsId, displayName, email, country, tel) {
+        try{
+            return await Users.findOneAndUpdate({_id: paramsId},
+                {
+                displayName: displayName,
+                email: email,
+                country: country,
+                tel: tel
+            },
             {
-            'displayName': displayName,
-            'email': email,
-            'country': country,
-            'tel': tel
-        },
-        {
-            new: true,
-            runValidators: true
+                new: true,
+                runValidators: true
+            }
+            )
         }
-        )
+        catch(err) {
+            console.error(err)
+        }
+    }
+
+    static async removeUser(paramsId) {
+        try {
+            return await Users.findByIdAndDelete(paramsId)
+        }
+        catch(err) {
+            console.error(err)
+        }
     }
 
     
