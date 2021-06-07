@@ -2,6 +2,7 @@ const Posts = require('../models/postsSchema');
 const mongoose = require('mongoose')
 const { UserSchema } = require('../models/userSchema');
 const Users = mongoose.model('users', UserSchema)
+const Validations = require('../validators/validator')
 
 module.exports = class PostServices{
 
@@ -12,6 +13,12 @@ module.exports = class PostServices{
      */
     static async createPost(paramsId, content) {
         try{
+            const { error, isValid } = await Validations.newPost(content)
+
+            if(!isValid) {
+                return error
+            }
+
             let user = await Users.findById(paramsId)
             let newPost = await new Posts({content})
 
