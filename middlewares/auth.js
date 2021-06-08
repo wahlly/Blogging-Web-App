@@ -2,12 +2,20 @@
 
 module.exports = class Authenticate{
     static requireLogin(req, res, next){
-        if(req.user) {
-            next()
+        try{
+            if(req.user) {
+                return next()
+            }
+            return res.status(401).json({
+                status: 'failed',
+                msg: 'Unauthorized user!'
+            })
         }
-        return res.status(401).json({
-            status: 'failed',
-            msg: 'Unauthorized user!'
-        })
+        catch(err) {
+            return res.status(500).json({
+                status: 'error',
+                msg: err
+            })
+        }
     }
 }
