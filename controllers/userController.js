@@ -75,6 +75,68 @@ module.exports = class UserController{
     }
 
     /**
+     * @route PoST /auth/resetPassword
+     * @param {user's email} req 
+     * @returns the confirmtion token
+     */
+    static async requestPasswordChange(req, res) {
+        try {
+            let newToken = await UserServices.resetPasswordRequest(req.body.email)
+
+            if(!newToken) {
+                return res.status(404).json({
+                    status: 'failed',
+                    msg: 'User not found!'
+                })
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                msg: newToken
+            })
+        }
+        catch(err) {
+            return res.status(500).json({
+                status: 'failed',
+                msg: 'server error' + err
+                
+            })
+        }
+    }
+
+    /**
+     * @route PoST /auth/newPassword
+     * @param {user's id} req.params 
+     * @param {received Token} req.params
+     * @param {new password} req.body
+     * @returns user updated profile
+     */
+    static async changePassword(req, res) {
+        try {
+            let newPasswordReset = await UserServices.resetPassword(req.params.userId, req.params.token, req.body.password)
+
+            if(!newPasswordReset) {
+                return res.status(400).json({
+                    msg: 'failed'
+                })
+            }
+
+            newPasswordReset.hashPassword = undefined
+
+            return res.status(200).json({
+                status: 'success',
+                newPasswordReset
+            })
+        }
+        catch(err) {
+            return res.status(500).json({
+                status: 'failed',
+                msg: 'server error' + err
+            })
+        }
+    }
+
+    /**
      *@route GET /api/user/:displayName
      * @param {user's displayName} req
      * @returns the user's profile if found

@@ -17,8 +17,9 @@ exports.UserSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        require: true,
-        unique: [true, 'email has been used by another user']
+        required: true,
+        unique: [true, 'email has been used by another user'],
+        trim: true
     },
     hashPassword: {
         type: String

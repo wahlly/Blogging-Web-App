@@ -1,9 +1,12 @@
 const mongoose = require('mongoose')
 const { UserSchema } = require('../models/userSchema')
 const Users = mongoose.model('users', UserSchema)
-const Validations = require('../validators/validator');
+const Token = require('../models/token')
+const Validations = require('../validators/validator')
 const bcrypt = require('bcrypt')
+const crypto = require('crypto')
 const saltRound = 10
+const sendEmail = require('../utils/email/sendEmail')
 
 module.exports = class UserServices{
 
@@ -37,6 +40,78 @@ module.exports = class UserServices{
         }
         catch(err) {
             console.error(err)
+        }
+    }
+
+    /**
+     *@desc generates a token to confirm that it's the user that requested for password reset
+     * @param {user's email} usersMail 
+     * @returns a token in which will be sent to the user's mail also with a redirection link to fasten password reset
+     */
+    static async resetPasswordRequest(usersMail) {
+        try{
+            //check if user exists
+            const user = await Users.findOne({ email: usersMail })
+
+            //check if user has an existing token if true, delete token
+            let token = await Token.findOne({userId: user._id})
+            if(token) {
+                await Token.findByIdAndDelete(token._id)
+            }
+
+            let resetToken = await crypto.randomBytes(32).toString('hex')
+            const hash = await bcrypt.hash(resetToken, 10)
+
+            await new Token({
+                userId: user._id,
+                token: hash,
+                createdAt: Date.now()
+            }).save()
+
+            const link = `localhost:7000/passwordReset?token=${resetToken}&id=${user._id}`;
+            await sendEmail('olaifaolawale43@yahoo.com',"Password Reset Request",{name: user.displayName, link}, '../template/reqResetPwd.handlebars')
+
+            return resetToken
+
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+
+    /**
+     * @desc takes the new password, hash and then store it as the user's password. it then deletes the used token.
+     * @param {user's id} paramsId 
+     * @param {token sent to mail} token 
+     * @param {new password to be used by the user} password 
+     * @returns the user's acct with the password updated with the new password
+     */
+    static async resetPassword(paramsId, token, password) {
+        try{
+            let PasswordResetToken = await Token.findOne({ userId: paramsId })
+
+            await bcrypt.compare(token, PasswordResetToken.token)
+
+            const hash = await bcrypt.hash(password, 10)
+
+            await Users.findOneAndUpdate({_id: paramsId}, {$set: {hashPassword: hash}}, {new: true, runValidators: true})
+
+
+            const user = await Users.findById(paramsId)
+
+            await sendEmail(
+                'olaifaolawale43@yahoo.com',
+                'Password Reset Successfully',
+                { name: user.displayName },
+                '../template/resetPwd.handlebars'
+                )
+
+            await PasswordResetToken.deleteOne()
+
+            return user
+        }
+        catch(err) {
+          console.error(err)
         }
     }
 
