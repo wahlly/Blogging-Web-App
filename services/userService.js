@@ -69,7 +69,7 @@ module.exports = class UserServices{
             }).save()
 
             const link = `localhost:7000/passwordReset?token=${resetToken}&id=${user._id}`;
-            await sendEmail('olaifaolawale43@yahoo.com',"Password Reset Request",{name: user.displayName, link}, '../template/reqResetPwd.handlebars')
+            await sendEmail(user.email,"Password Reset Request",{name: user.displayName, link}, '../template/reqResetPwd.handlebars')
 
             return resetToken
 
@@ -100,7 +100,7 @@ module.exports = class UserServices{
             const user = await Users.findById(paramsId)
 
             await sendEmail(
-                'olaifaolawale43@yahoo.com',
+                user.email,
                 'Password Reset Successfully',
                 { name: user.displayName },
                 '../template/resetPwd.handlebars'
