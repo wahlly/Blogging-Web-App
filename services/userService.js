@@ -9,7 +9,6 @@ const saltRound = 10
 const sendEmail = require('../utils/email/sendEmail')
 
 module.exports = class UserServices{
-
     static async userRegistration(userProfile) {
         try{
             let { error, isValid } = await Validations.newUser(userProfile)
@@ -35,7 +34,6 @@ module.exports = class UserServices{
      */
     static async credentialsValidation(usersMail) {
         try {
-
             return await Users.findOne({email: usersMail})
         }
         catch(err) {
@@ -61,7 +59,6 @@ module.exports = class UserServices{
 
             let resetToken = await crypto.randomBytes(32).toString('hex')
             const hash = await bcrypt.hash(resetToken, 10)
-
             await new Token({
                 userId: user._id,
                 token: hash,
@@ -72,7 +69,6 @@ module.exports = class UserServices{
             await sendEmail(user.email,"Password Reset Request",{name: user.displayName, link}, '../template/reqResetPwd.handlebars')
 
             return resetToken
-
         }
         catch(err){
             console.error(err)
@@ -89,29 +85,24 @@ module.exports = class UserServices{
     static async resetPassword(paramsId, token, password) {
         try{
             let PasswordResetToken = await Token.findOne({ userId: paramsId })
-
             await bcrypt.compare(token, PasswordResetToken.token)
-
             const hash = await bcrypt.hash(password, 10)
-
             await Users.findOneAndUpdate({_id: paramsId}, {$set: {hashPassword: hash}}, {new: true, runValidators: true})
 
-
             const user = await Users.findById(paramsId)
-
             await sendEmail(
                 user.email,
                 'Password Reset Successfully',
                 { name: user.displayName },
                 '../template/resetPwd.handlebars'
                 )
-
             await PasswordResetToken.deleteOne()
 
             return user
         }
         catch(err) {
           console.error(err)
+
         }
     }
 
@@ -172,6 +163,4 @@ module.exports = class UserServices{
             console.error(err)
         }
     }
-
-    
 }
