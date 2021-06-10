@@ -1,6 +1,7 @@
 const usersRoutes = require('./usersRoutes')
 const postRoutes = require('./postRoutes')
 const authRoute = require('./authRoutes')
+const githubAuth = require('./githubAuth')
 const { requireLogin } = require('../middlewares/auth')
 
 module.exports = (app) => {

@@ -4,21 +4,19 @@ const bcrypt = require('bcrypt')
 exports.UserSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        require: true
     },
     lastName: {
         type: String,
-        require: true
     },
     displayName: {
         type: String,
-        require: true,
+        required: true,
         unique: [true, 'displayName already taken, try something else']
     },
     email: {
         type: String,
-        required: true,
         unique: [true, 'email has been used by another user'],
+        required: [true, 'please input your email'],
         trim: true
     },
     hashPassword: {
@@ -26,12 +24,11 @@ exports.UserSchema = new mongoose.Schema({
     },
     country: {
         type: String,
-        required: [true, 'please, fill in your country!']
+        // required: [true, 'please, fill in your country!']
     },
     tel: {
         type: Number,
         unique: [true, 'number has already been used!'],
-        required: [true, 'phone number is required!']
     }
 },
 {
