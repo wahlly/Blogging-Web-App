@@ -25,7 +25,7 @@ passport.use(
         {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: "http://localhost:7000/login/github/callback"
+        callbackURL: "http://localhost:7000/auth/github/callback"
         },
   function(accessToken, refreshToken, profile, cb) {
     Users.findOne({ userId: profile.id }, (err, user) => {
@@ -52,7 +52,7 @@ passport.use(
 ));
 
 
-router.get('/', (req, res) => {
+router.get('/login', (req, res) => {
     console.log(req.user)
     res.send('Simple chill Blog2')
 })
@@ -63,7 +63,7 @@ router.get('/github', passport.authenticate('github'));
 router.get('/github/callback', passport.authenticate('github', { failureRedirect: '/login' }),
   (req, res) => {
     // Successful authentication, redirect home.
-    res.redirect('/login');
+    res.redirect('/auth/login');
   });
 
 router.get('/logout', (req, res) => {

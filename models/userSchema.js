@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 
 exports.UserSchema = new mongoose.Schema({
+    userId: {
+        type: String
+    },
     firstName: {
         type: String,
     },
@@ -25,6 +28,9 @@ exports.UserSchema = new mongoose.Schema({
     country: {
         type: String,
         // required: [true, 'please, fill in your country!']
+    },
+    image: {
+        type: String
     },
     tel: {
         type: Number,
