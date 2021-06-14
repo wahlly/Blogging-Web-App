@@ -1,6 +1,5 @@
 const PostServices = require('../services/postsService')
 
-
 module.exports = class PostController{
 
     /**
@@ -153,6 +152,99 @@ module.exports = class PostController{
             return res.status(500).json({
                 status: 'success',
                 error
+            })
+        }
+    }
+
+    static async singleFileUpload(req, res) {
+        try {
+            let file = req.file
+            let uploadedFile = await PostServices.uploadSingleFile(req.params.id, file)
+            if(!uploadedFile) {
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'unable to upload'
+                })
+            }
+            res.status(200).json({
+                status: 'success',
+                msg: 'File uploaded successfully'
+            })
+        }
+        catch(err) {
+            console.error(err)
+            res.status(400).json({
+                status: 'failed',
+                msg: err.message
+            })
+        }
+    }
+
+    static async multipleFileUpload(req, res){
+        try {
+          const files = await PostServices.uploadMultipleFiles(req.params.id, req)
+          if(!files) {
+              return res.status(400).json({
+                  status: 'failed',
+                  msg: 'An error occured while uploading the files'
+              })
+          }
+
+            res.status(200).json({
+                status: 'success',
+                msg: 'Files uploaded successfully'
+            })
+        }
+        catch(err) {
+            res.status(400).json({
+                status: 'failed',
+                msg: err.message
+            })
+        }
+    }
+
+    static async getAllSingleFiles(req, res) {
+        try {
+            const files = await PostServices.retrieveAllSingleFiles(req.params.id)
+            if(!files) {
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'unable to retrieve posts'
+                })
+            }
+
+            res.status(200).json({
+                status: 'success',
+                files
+            })
+        }
+        catch(err) {
+            res.status(400).json({
+                status: 'failed',
+                error: err.message
+            })
+        }
+    }
+
+    static async getAllMultipleFiles(req, res) {
+        try {
+            const files = await PostServices.retrieveMultipleFiles(req.params.id)
+            if(!files || files == null) {
+                return res.status(400).json({
+                    status: 'failed',
+                    msg: 'oops, unable to get files'
+                })
+            }
+
+            res.status(200).json({
+                status: 'success',
+                files
+            })
+        }
+        catch(err) {
+            res.status(400).json({
+                status: 'failed',
+                error: err.message
             })
         }
     }

@@ -1,5 +1,6 @@
 const router = require('express').Router()
-const { createNewPost, getAllPosts, updatePost, deletePost, getPost } = require('../controllers/postController')
+const { createNewPost, getAllPosts, updatePost, deletePost, getPost, singleFileUpload, multipleFileUpload, getAllSingleFiles, getAllMultipleFiles } = require('../controllers/postController')
+const upload = require('../utils/fileUploads/fileHelper')
 
 /**@route POST to create a new post */
 router.post('/:id', (req, res) => createNewPost(req, res))
@@ -15,6 +16,14 @@ router.put('/edit/:id', (req, res) => updatePost(req, res))
 
 /**@route DELETE to delete a post created by a user */
 router.delete('/:id', (req, res) => deletePost(req, res))
+
+router.post('/files/singlefile/:id', upload.single('file'), (req, res) => singleFileUpload(req, res))
+
+router.post('/files/multiplefiles/:id', upload.array('files'), (req, res) => multipleFileUpload(req, res))
+
+router.get('/files/singles/:id', (req, res) => getAllSingleFiles(req, res))
+
+router.get('/files/multiples/:id', (req, res) => getAllMultipleFiles(req, res))
 
 
 module.exports = router
