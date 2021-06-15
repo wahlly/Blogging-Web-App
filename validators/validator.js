@@ -2,7 +2,10 @@ const validator = require("validator");
 
 
 module.exports = class Validations{
-
+    /**
+     * @desc validates and sanitize an input
+     * @param {object} userProfile 
+     */
     static async newUser(userProfile){
         let error = {}
         if(validator.isEmpty(userProfile['firstName']) || validator.isEmpty(userProfile['lastName'])
@@ -79,5 +82,4 @@ module.exports = class Validations{
             isValid: Object.keys(error).length == 0
         }
     }
-
 }

@@ -3,19 +3,15 @@ const PostServices = require('../services/postsService')
 module.exports = class PostController{
 
     /**
+     * @desc create a new post
      * @route PoST /api/posts/:id
-     * @param {userId} req.params
-     * @param {blog content} req.body
-     * @returns newly created post
+     * @returns {newly created post}
      */
     static async createNewPost(req, res) {
-
         try {
             let userId = req.params.id
             let content = req.body.content
-
             let newPost = await PostServices.createPost(userId, content)
-
             if(!newPost.content) {
                 return res.status(400).json({
                     status: 'failed',
@@ -35,25 +31,22 @@ module.exports = class PostController{
                 msg: 'server error'
             })
         }
-
     }
 
     /**
-     * @route GET /api/posts/:id
-     * @param {post id} req
      * @desc get a single post by the post's id 
+     * @route GET /api/posts/:id
+     * @returns {the specified post}
      */
     static async getPost(req, res) {
         try{
             let post = await PostServices.retrievePost(req.params.id)
-
             if(!post) {
                 return res.status(404).json({
                     status:'failed',
                     msg: 'Post not found'
                 })
             }
-
             return res.status(200).json({
                 status: 'success',
                 post: post
@@ -68,17 +61,13 @@ module.exports = class PostController{
     }
 
     /**
-     * 
-     * @param {post author} req 
      * @route GET /api/posts/user/:authorId
      * @desc get every posts that belong to a specified author, using the author's id
-     * @returns all the given user's post
+     * @returns {all the given user's post}
      */
     static async getAllPosts(req, res) {
-
         try {
             let post = await PostServices.retrieveAllPosts(req.params.author)
-
             if(!post) {
                 return res.status(404).json({
                     status: 'failed',
@@ -96,20 +85,16 @@ module.exports = class PostController{
                 msg: 'server error'
             })
         }
-
     }
 
     /**
+     * @desc update/edit a post by its id
      * @route PUT /api/posts/edit/:postId
-     * @param {post id} req
-     * @param {post content} req.body 
-     * @returns updated post
+     * @returns {updated post}
      */
     static async updatePost(req, res) {
-
         try {
             let post = await PostServices.editPost(req.params.id, req.body.content)
-
             if(!post) {
                 return res.status(404).json({
                     status: 'failed',
@@ -120,26 +105,23 @@ module.exports = class PostController{
                 status: 'success',
                 post: post
             })
-        } catch (error) {
+        }
+        catch (error) {
             return res.status(500).json({
                 status: 'failed',
                 error
             })
         }
-
     }
 
     /**
-     * @route DELETE 
-     * @param {post id} req 
+     * @route DELETE /api/posts/:postId
      * @desc finds the post by its id and deletes it
-     * @returns success/error message on completion
+     * @returns {success/error message on completion}
      */
     static async deletePost(req, res) {
-
         try {
             let post = await PostServices.removePost(req.params.id)
-
             if(!post) {
                 return res.status(400).json({ msg: 'Bad request' })
             }
@@ -156,6 +138,11 @@ module.exports = class PostController{
         }
     }
 
+    /**
+     * @desc upload of a single file at a time
+     * @route PoST /api/posts/files/singlefile/:userId
+     * @returns {status message}
+     */
     static async singleFileUpload(req, res) {
         try {
             let file = req.file
@@ -180,6 +167,11 @@ module.exports = class PostController{
         }
     }
 
+    /**
+     * @desc upload of multiple files at a time
+     * @route PoST /api/posts/files/multiplefiles/:UserId
+     * @returns {status message}
+     */
     static async multipleFileUpload(req, res){
         try {
           const files = await PostServices.uploadMultipleFiles(req.params.id, req)
@@ -189,7 +181,6 @@ module.exports = class PostController{
                   msg: 'An error occured while uploading the files'
               })
           }
-
             res.status(200).json({
                 status: 'success',
                 msg: 'Files uploaded successfully'
@@ -203,6 +194,11 @@ module.exports = class PostController{
         }
     }
 
+    /**
+     * @desc get all uploaded single files
+     * @route GET /api/posts/files/singles/:userId
+     * @returns {Array of Files}
+     */
     static async getAllSingleFiles(req, res) {
         try {
             const files = await PostServices.retrieveAllSingleFiles(req.params.id)
@@ -212,7 +208,6 @@ module.exports = class PostController{
                     msg: 'unable to retrieve posts'
                 })
             }
-
             res.status(200).json({
                 status: 'success',
                 files
@@ -226,6 +221,11 @@ module.exports = class PostController{
         }
     }
 
+    /**
+     * @desc get all uploaded multiple files
+     * @route GET /api/posts/files/multiples/:userId 
+     * @returns {Nested Array of Files}
+     */
     static async getAllMultipleFiles(req, res) {
         try {
             const files = await PostServices.retrieveMultipleFiles(req.params.id)
@@ -235,7 +235,6 @@ module.exports = class PostController{
                     msg: 'oops, unable to get files'
                 })
             }
-
             res.status(200).json({
                 status: 'success',
                 files

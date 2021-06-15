@@ -1,5 +1,3 @@
-
-
 module.exports = class Authenticate{
     static requireLogin(req, res, next){
         try{

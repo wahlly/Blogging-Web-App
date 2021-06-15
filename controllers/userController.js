@@ -3,14 +3,12 @@ const jwt = require('jsonwebtoken')
 
 module.exports = class UserController{
     /**
-     * @route PoST 
-     * @param {user profile} req
-     * @returns the user's newly created profile
+     * @desc Creates a new user
+     * @route PoST /auth/register
+     * @returns {the user's newly created profile}
      */
     static async createNewUser(req, res) {
-
         try {
-    
             let newUser = await UserServices.userRegistration(req.body)
             newUser.hashPassword = undefined
 
@@ -26,13 +24,12 @@ module.exports = class UserController{
                 msg: err
             })
         }
-
     }
 
     /**
-     * @route PoST 
-     * @param {login details} req 
-     * @returns a session token if user is valid
+     * @desc confirms a pre-existing user before login
+     * @route PoST /auth/login
+     * @returns {a session token if user is valid}
      */
     static async checkUsersLogin(req, res) {
         try {
@@ -50,7 +47,6 @@ module.exports = class UserController{
                     msg: 'oops, wrong password! try again'
                 })
             }
-
             return res.status(200).json({
                 status: 'success',
                 token: jwt.sign({
@@ -75,21 +71,19 @@ module.exports = class UserController{
     }
 
     /**
+     * @desc send a password reset token to the user's mail
      * @route PoST /auth/resetPassword
-     * @param {user's email} req 
-     * @returns the confirmtion token
+     * @returns {the confirmation token/sent to the user's mail}
      */
     static async requestPasswordChange(req, res) {
         try {
             let newToken = await UserServices.resetPasswordRequest(req.body.email)
-
             if(!newToken) {
                 return res.status(404).json({
                     status: 'failed',
                     msg: 'User not found!'
                 })
             }
-
             return res.status(200).json({
                 status: 'success',
                 msg: newToken
@@ -105,24 +99,19 @@ module.exports = class UserController{
     }
 
     /**
+     * @desc changes the user's password after verifying the submitted token
      * @route PoST /auth/newPassword
-     * @param {user's id} req.params 
-     * @param {received Token} req.params
-     * @param {new password} req.body
-     * @returns user updated profile
+     * @returns {user updated profile}
      */
     static async changePassword(req, res) {
         try {
             let newPasswordReset = await UserServices.resetPassword(req.params.userId, req.params.token, req.body.password)
-
             if(!newPasswordReset) {
                 return res.status(400).json({
                     msg: 'failed'
                 })
             }
-
             newPasswordReset.hashPassword = undefined
-
             return res.status(200).json({
                 status: 'success',
                 newPasswordReset
@@ -137,15 +126,13 @@ module.exports = class UserController{
     }
 
     /**
-     *@route GET /api/user/:displayName
-     * @param {user's displayName} req
-     * @returns the user's profile if found
+     * @desc gets a user by its display name
+     * @route GET /api/user/:displayName
+     * @returns {the user's profile if found}
      */
     static async getUserByDisplayName(req, res) {
-
         try {
             let user = await UserServices.retrieveUserByDisplayName(req.params.displayName)
-
             if(!user) {
                 return res.status(404).json({
                     status: 'failed',
@@ -164,20 +151,16 @@ module.exports = class UserController{
                 error
             })
         }
-
     }
 
     /**
-     * 
+     * @desc edits and update a use profile
      * @route PUT /api/user/:userId
-     * @param {user's id & profile to be updated} req 
-     * @returns updated user's profile if successful
+     * @returns {updated user's profile if successful}
      */
     static async updateUserProfile(req, res) {
-        
         try {
             let user = await UserServices.editUserProfile(req.params.id, req.body.displayName, req.body.email, req.body.country, req.body.tel)
-
             if(!user) {
                 return res.status(400).json({
                     status: 'failed',
@@ -199,10 +182,13 @@ module.exports = class UserController{
 
     }
 
+    /**
+     * @desc deletes a user by its id
+     * @route DELETE /api/user/:userId
+     */
     static async deleteUser(req, res) {
         try {
             let user = await UserServices.removeUser(req.params.id)
-
             if(!user) {
                 return res.status(400).json({
                     status: 'failed',

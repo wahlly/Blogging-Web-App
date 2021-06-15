@@ -9,17 +9,20 @@ const saltRound = 10
 const sendEmail = require('../utils/email/sendEmail')
 
 module.exports = class UserServices{
+    /**
+     * @desc registers a new user into the database
+     * @param {Object} userProfile 
+     * @returns {Promise<user>}
+     */
     static async userRegistration(userProfile) {
         try{
             let { error, isValid } = await Validations.newUser(userProfile)
             if(!isValid) {
                 return error
             }
-
             const newUser = new Users(userProfile)
             const salt = bcrypt.genSaltSync(saltRound)
             newUser.hashPassword = bcrypt.hashSync(userProfile.password, salt)
-
             return newUser.save()
         }
         catch(err) {
@@ -28,9 +31,9 @@ module.exports = class UserServices{
     }
 
     /**
-     * @param {users email} usersMail
-     * @desc checks for the given mail in the database to see if it exists
-     * @returns the mail if it exists and null if it doesn't 
+     * @desc checks for the given mail in the database to see if the user pre-exists
+     * @param {email} usersMail
+     * @returns {Promise<the mail if it exists and null if it doesn't>}
      */
     static async credentialsValidation(usersMail) {
         try {
@@ -43,14 +46,13 @@ module.exports = class UserServices{
 
     /**
      *@desc generates a token to confirm that it's the user that requested for password reset
-     * @param {user's email} usersMail 
-     * @returns a token in which will be sent to the user's mail also with a redirection link to fasten password reset
+     * @param {email} usersMail 
+     * @returns {Promise<a token in which will be sent to the user's mail also with a redirection link to fasten password reset>}
      */
     static async resetPasswordRequest(usersMail) {
         try{
             //check if user exists
             const user = await Users.findOne({ email: usersMail })
-
             //check if user has an existing token if true, delete token
             let token = await Token.findOne({userId: user._id})
             if(token) {
@@ -67,7 +69,6 @@ module.exports = class UserServices{
 
             const link = `localhost:7000/passwordReset?token=${resetToken}&id=${user._id}`;
             await sendEmail(user.email,"Password Reset Request",{name: user.displayName, link}, '../template/reqResetPwd.handlebars')
-
             return resetToken
         }
         catch(err){
@@ -76,20 +77,20 @@ module.exports = class UserServices{
     }
 
     /**
-     * @desc takes the new password, hash and then store it as the user's password. it then deletes the used token.
-     * @param {user's id} paramsId 
-     * @param {token sent to mail} token 
-     * @param {new password to be used by the user} password 
-     * @returns the user's acct with the password updated with the new password
+     * @desc confirms if the token is same as the one generated, then takes the new password, hash and then store it as the user's password. it then deletes the used token.
+     * @param {Number} userId 
+     * @param {String} token
+     * @param {String} password 
+     * @returns {Promise<the user's acct with the password updated with the new password>}
      */
-    static async resetPassword(paramsId, token, password) {
+    static async resetPassword(userId, token, password) {
         try{
-            let PasswordResetToken = await Token.findOne({ userId: paramsId })
+            let PasswordResetToken = await Token.findOne({ userId: userId })
             await bcrypt.compare(token, PasswordResetToken.token)
             const hash = await bcrypt.hash(password, 10)
-            await Users.findOneAndUpdate({_id: paramsId}, {$set: {hashPassword: hash}}, {new: true, runValidators: true})
+            await Users.findOneAndUpdate({_id: userId}, {$set: {hashPassword: hash}}, {new: true, runValidators: true})
 
-            const user = await Users.findById(paramsId)
+            const user = await Users.findById(userId)
             await sendEmail(
                 user.email,
                 'Password Reset Successfully',
@@ -97,19 +98,17 @@ module.exports = class UserServices{
                 '../template/resetPwd.handlebars'
                 )
             await PasswordResetToken.deleteOne()
-
             return user
         }
         catch(err) {
           console.error(err)
-
         }
     }
 
     /**
      * @desc get a user's info or profile using its displayName
-     * @param {user's displayName} displayName 
-     * @returns either the user's profile if found or null if otherwise
+     * @param {String} displayName 
+     * @returns {Promise<either the user's profile if found or null if otherwise>}
      */
     static async retrieveUserByDisplayName(displayName) {
         try {
@@ -131,13 +130,13 @@ module.exports = class UserServices{
 
     /**
      * @desc finds a user with the given id and update whats given into his profile.
-     * @param {user's id} paramsId
-     * @param {editable profile} req.body 
-     * @returns the updated user's profile if found
+     * @param {Number} userId
+     * @param {Object} req.body 
+     * @returns {Promise<the updated user's profile if found>}
      */
-    static async editUserProfile(paramsId, displayName, email, country, tel) {
+    static async editUserProfile(userId, displayName, email, country, tel) {
         try{
-            return await Users.findOneAndUpdate({_id: paramsId},
+            return await Users.findOneAndUpdate({_id: userId},
                 {
                 displayName: displayName,
                 email: email,
@@ -155,9 +154,14 @@ module.exports = class UserServices{
         }
     }
 
-    static async removeUser(paramsId) {
+    /**
+     * @desc finds a user by id and deletes the user from the database
+     * @param {Number} userId 
+     * @returns {Promise}
+     */
+    static async removeUser(userId) {
         try {
-            return await Users.findByIdAndDelete(paramsId)
+            return await Users.findByIdAndDelete(userId)
         }
         catch(err) {
             console.error(err)
