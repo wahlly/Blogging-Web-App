@@ -8,7 +8,6 @@ const fileSizeFormatter = require('../utils/fileUploads/sizeFormatter')
 const singleFile = require('../models/singleFile')
 
 module.exports = class PostServices{
-
     /**
      * @desc create a new blog post
      * @param {String} content
@@ -71,6 +70,11 @@ module.exports = class PostServices{
      */
     static async editPost(paramsId, content) {
         try{
+            const { error, isValid } = await Validations.newPost(content)
+            if(!isValid) {
+                return error
+            }
+
             return await Posts.findOneAndUpdate({_id: paramsId}, {content: content}, {new: true, runValidators: true})
         }
         catch(err) {

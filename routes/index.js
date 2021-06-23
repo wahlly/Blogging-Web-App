@@ -14,5 +14,5 @@ module.exports = (app) => {
 
     app.use('/api/user', usersRoutes)
 
-    app.use('/api/posts', requireLogin, postRoutes)
+    app.use('/api/posts', postRoutes)
 }

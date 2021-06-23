@@ -95,15 +95,15 @@ module.exports = class PostController{
     static async updatePost(req, res) {
         try {
             let post = await PostServices.editPost(req.params.id, req.body.content)
-            if(!post) {
-                return res.status(404).json({
+            if(!post || !post.content) {
+                return res.status(400).json({
                     status: 'failed',
-                    msg: 'Post not found'
+                    post
                 })
             }
             return res.status(200).json({
                 status: 'success',
-                post: post
+                post
             })
         }
         catch (error) {
