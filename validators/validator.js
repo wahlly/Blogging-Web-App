@@ -82,4 +82,37 @@ module.exports = class Validations{
             isValid: Object.keys(error).length == 0
         }
     }
+
+    static async beforeUpdate(userProfile) {
+        let error = {}
+        if(validator.isEmpty(userProfile['displayName']) || validator.isEmpty(userProfile['email']) || 
+        validator.isEmpty(userProfile['country']) || validator.isEmpty(userProfile['tel'])){
+            error.msg = 'please fill all required field'
+        }
+
+        if(validator.isBoolean(userProfile['displayName']) || validator.isBoolean(userProfile['email']) || 
+        validator.isBoolean(userProfile['country']) || validator.isBoolean(userProfile['tel'])){
+            error.msg = 'sorry, values cannot be a Boolean!'
+        }
+
+        if(!validator.isAlpha(userProfile['country'])){
+             error.msg = 'country should be filled with only alphabets!'
+       }
+
+       if(!validator.isEmail(userProfile['email'])) {
+           error.msg = 'please, input a valid email!'
+       }
+
+       if(userProfile['tel'].length < 10) {
+           error.msg = 'please, provide a valid phone number'
+       }
+
+       if(!validator.isMobilePhone(userProfile['tel'])) {
+        error.msg = 'please, input a valid telephone number'
+       }
+       return {
+           error,
+           isValid: Object.keys(error).length == 0
+       }
+    }
 }

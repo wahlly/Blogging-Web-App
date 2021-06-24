@@ -166,11 +166,11 @@ module.exports = class UserController{
      */
     static async updateUserProfile(req, res) {
         try {
-            let user = await UserServices.editUserProfile(req.params.id, req.body.displayName, req.body.email, req.body.country, req.body.tel)
-            if(!user) {
+            let user = await UserServices.editUserProfile(req.params.id, req.body)
+            if(!user || user.msg) {
                 return res.status(400).json({
                     status: 'failed',
-                    msg: 'cannot be updated!'
+                    error: user.msg
                 })
             }
             user.hashPassword = undefined

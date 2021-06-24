@@ -37,6 +37,10 @@ module.exports = class UserServices{
      */
     static async credentialsValidation(usersMail) {
         try {
+            let { error, isValid } = await Validations.checkMail(usersMail)
+            if(!isValid) {
+                return error
+            }
             return await Users.findOne({email: usersMail})
         }
         catch(err) {
@@ -51,6 +55,10 @@ module.exports = class UserServices{
      */
     static async resetPasswordRequest(usersMail) {
         try{
+            let { error, isValid } = await Validations.checkMail(usersMail)
+            if(!isValid) {
+                return error
+            }
             //check if user exists
             const user = await Users.findOne({ email: usersMail })
             //check if user has an existing token if true, delete token
@@ -134,14 +142,18 @@ module.exports = class UserServices{
      * @param {Object} req.body 
      * @returns {Promise<the updated user's profile if found>}
      */
-    static async editUserProfile(userId, displayName, email, country, tel) {
+    static async editUserProfile(userId, userProfile) {
         try{
+            let { error, isValid } = await Validations.beforeUpdate(userProfile)
+            if(!isValid) {
+                return error
+            }
             return await Users.findOneAndUpdate({_id: userId},
                 {
-                displayName: displayName,
-                email: email,
-                country: country,
-                tel: tel
+                displayName: userProfile.displayName,
+                email: userProfile.email,
+                country: userProfile.country,
+                tel: userProfile.tel
             },
             {
                 new: true,
