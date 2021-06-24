@@ -10,6 +10,12 @@ module.exports = class UserController{
     static async createNewUser(req, res) {
         try {
             let newUser = await UserServices.userRegistration(req.body)
+            if(!newUser || newUser.msg) {
+                return res.status(400).json({
+                    status: 'failed',
+                    error: newUser
+                })
+            }
             newUser.hashPassword = undefined
 
             return res.status(200).json({
@@ -86,7 +92,7 @@ module.exports = class UserController{
             }
             return res.status(200).json({
                 status: 'success',
-                msg: newToken
+                token: newToken
             })
         }
         catch(err) {
